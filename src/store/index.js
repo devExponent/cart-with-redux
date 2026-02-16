@@ -13,30 +13,41 @@ const cartSlice = createSlice({
   reducers: {
     addCart: (state, action) => {
       const newItem = action.payload;
-      const existingItemIndex = state.shopCart.findIndex(
+      const existingItem = state.shopCart.find(
         (item) => item.id === newItem.id,
       );
-      const updatedCartQuantity = state.totalQuantity + 1;
-      if (existingItemIndex >= 0) {
-        const updatedItems = state.shopCart.map((item, index) => {
-          if (index === existingItemIndex) {
-            return { ...item, quantity: item.quantity + 1 };
-          }
-          return item;
-        });
 
-        return {
-          shopCart: updatedItems,
-          totalQuantity: updatedCartQuantity,
-        };
-      } else
-        return {
-          shopCart: [...state.shopCart, { ...newItem, quantity: 1 }],
-          totalQuantity: updatedCartQuantity,
-        };
+      state.totalQuantity++;
+
+      if (existingItem) {
+        existingItem.quantity++;
+      } else {
+        state.shopCart.push({ ...newItem, quantity: 1 });
+      }
+    },
+    increaseQty: (state, action) => {
+      const itemInc = action.payload;
+      const item = state.shopCart.find((item) => item.id === itemInc.id);
+
+      if (item) {
+        item.quantity++;
+        state.totalQuantity++;
+      }
+    },
+    decreaseQty: (state, action) => {
+      const itemInc = action.payload;
+      const item = state.shopCart.find((item) => item.id === itemInc.id);
+
+      if (item) {
+        if (item.quantity === 0) {
+          return;
+        }
+        item.quantity--;
+        state.totalQuantity--;
+      }
     },
     showCart: (state) => {
-      state.showCart = !true;
+      state.showCart = !state.showCart;
     },
   },
 });
